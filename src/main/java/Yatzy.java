@@ -12,9 +12,14 @@ import static java.util.Arrays.asList;
 
 public class Yatzy {
 
-    private static Stream<Integer> filterNumberByFrequency(IntStream dice, int targetNumber)
+    private static List<Integer> dice = null;
+
+    public Yatzy(int d1, int d2, int d3, int d4, int d5) {
+        this.dice = asList(d1, d2, d3, d4, d5);
+    }
+    private static Stream<Integer> filterNumberByFrequency(int targetNumber)
     {
-        Map<Integer, Long> frequency = dice.boxed().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
+        Map<Integer, Long> frequency = dice.stream().collect(Collectors.groupingBy(i -> i, Collectors.counting()));
 
         return  frequency.entrySet().stream()
                 .filter(e -> e.getValue() >= targetNumber)
@@ -22,56 +27,56 @@ public class Yatzy {
 
     }
 
-    public static int CalculOnesToSixes(IntStream dice, int targetNumber) {
-        return (int) dice.filter(die -> die == targetNumber).count() * targetNumber;
+    private static int CalculOnesToSixes(int targetNumber) {
+        return (int) dice.stream().filter(die -> die == targetNumber).count() * targetNumber;
     }
 
-    public static int chance(int d1, int d2, int d3, int d4, int d5)
+    public int chance()
     {
-        return d1 + d2 + d3 + d4 + d5;
+        return dice.stream().mapToInt(Integer::intValue).sum();
     }
 
-    public static int yatzy(int d1, int d2, int d3, int d4, int d5)
+    public int yatzy()
     {
-        boolean allSame = IntStream.of(d1, d2, d3, d4, d5).distinct().count() == 1;
+        boolean allSame = dice.stream().distinct().count() == 1;
         return allSame ? 50 : 0;
     }
 
-    public static int ones(int d1, int d2, int d3, int d4, int d5) {
+    public int ones() {
 
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 1);
+        return CalculOnesToSixes(1);
 
     }
 
-    public static int twos(int d1, int d2, int d3, int d4, int d5) {
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 2);
+    public int twos() {
+        return CalculOnesToSixes(2);
     }
 
-    public static int threes(int d1, int d2, int d3, int d4, int d5) {
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 3);
+    public int threes() {
+        return CalculOnesToSixes(3);
     }
 
-    public static int fours(int d1, int d2, int d3, int d4, int d5)
+    public int fours()
     {
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 4);
+        return CalculOnesToSixes(4);
     }
 
-    public static int fives(int d1, int d2, int d3, int d4, int d5)
+    public int fives()
     {
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 5);
+        return CalculOnesToSixes(5);
 
     }
 
-    public static int sixes(int d1, int d2, int d3, int d4, int d5)
+    public int sixes()
     {
-        return CalculOnesToSixes(IntStream.of(d1, d2, d3, d4, d5), 6);
+        return CalculOnesToSixes(6);
     }
 
 
 
-    public static int pair(int d1, int d2, int d3, int d4, int d5)
+    public int pair()
     {
-        List<Integer> pairs = filterNumberByFrequency(IntStream.of(d1, d2, d3, d4, d5), 2)
+        List<Integer> pairs = filterNumberByFrequency(2)
                 .sorted(reverseOrder())
                 .collect(toList());
 
@@ -80,38 +85,32 @@ public class Yatzy {
     }
 
 
-    public static int twoPairs(int d1, int d2, int d3, int d4, int d5)
+    public int twoPairs()
     {
-        List<Integer> pairs = filterNumberByFrequency(IntStream.of(d1, d2, d3, d4, d5), 2)
+        List<Integer> pairs = filterNumberByFrequency(2)
                 .sorted(reverseOrder())
                 .collect(toList());
 
         return pairs.size() >= 2 ? pairs.stream().mapToInt(pair -> pair * 2).sum()  : 0 ;
     }
 
-    public static int threeOfAKind(int d1, int d2, int d3, int d4, int d5)
+    public int threeOfAKind()
     {
-        return filterNumberByFrequency(IntStream.of(d1, d2, d3, d4, d5), 3)
+        return filterNumberByFrequency(3)
                 .findFirst()
                 .orElse(0) * 3;
     }
 
-    public static int fourOfAKind(int d1, int d2, int d3, int d4, int d5)
+    public int fourOfAKind()
     {
-        Map<Integer, Long> frequency = IntStream.of(d1, d2, d3, d4, d5)
-                .boxed()
-                .collect(Collectors.groupingBy(i -> i, Collectors.counting()));
-
-        return frequency.entrySet().stream()
-                .filter(e -> e.getValue() >= 4)
-                .map(Entry::getKey)
+        return filterNumberByFrequency(4)
                 .findFirst()
                 .orElse(0) * 4;
     }
 
-    public static int smallStraight(int d1, int d2, int d3, int d4, int d5)
+    public int smallStraight()
     {
-        boolean bool  = asList(d1, d2, d3, d4, d5)
+        boolean bool  = dice
             .stream()
             .sorted()
             .collect(toList())
@@ -120,9 +119,9 @@ public class Yatzy {
         return bool ? 15 : 0;
     }
 
-    public static int largeStraight(int d1, int d2, int d3, int d4, int d5)
+    public int largeStraight()
     {
-        boolean bool  = asList(d1, d2, d3, d4, d5)
+        boolean bool  = dice
                 .stream()
                 .sorted()
                 .collect(toList())
@@ -131,10 +130,10 @@ public class Yatzy {
         return bool ? 20 : 0;
     }
 
-    public static int fullHouse(int d1, int d2, int d3, int d4, int d5)
+    public int fullHouse()
     {
-        boolean bool =  (pair(d1, d2, d3, d4, d5) != 0) && (threeOfAKind(d1, d2, d3, d4, d5) != 0) && (yatzy(d1, d2, d3, d4, d5) == 0);
-        return bool ? asList(d1, d2, d3, d4, d5).stream().mapToInt(Integer::intValue).sum() : 0;
+        boolean bool =  (pair() != 0) && (threeOfAKind() != 0) && (yatzy() == 0);
+        return bool ? dice.stream().mapToInt(Integer::intValue).sum() : 0;
 
     }
 }
