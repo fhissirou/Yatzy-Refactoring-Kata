@@ -1,3 +1,7 @@
-/.idea/
-/target/
-/*.iml
+/java/.idea/
+/java/target/
+java/*.iml
+
+/scala/target/
+/scala/.idea/
+/scala/.bsp/
